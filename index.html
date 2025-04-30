@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色資料展示</title>
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+        }
+        #menu {
+            width: 15%;
+            background-color: #f4f4f4;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        #content {
+            width: 85%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        #menu a {
+            display: block;
+            padding: 10px;
+            color: #0366d6;
+            text-decoration: none;
+            margin: 5px 0;
+        }
+        #menu a:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <h3>選單</h3>
+        <a href="javascript:void(0)" onclick="loadContent('Character_Miller_obsidian.html')">Character Miller</a>
+        <a href="javascript:void(0)" onclick="loadContent('Character_Williams.html')">Dr. Emma Williams</a>
+        <a href="javascript:void(0)" onclick="loadContent('Character_JackChen.html')">Jack Chen</a>
+        <a href="javascript:void(0)" onclick="loadContent('character_markmap.html')">Character Markmap</a>
+    </div>
+    <div id="content">
+        <h2>歡迎選擇角色資料</h2>
+        <p>請從左側選單中選擇角色以查看其詳細資料。</p>
+    </div>
+
+    <script>
+        function loadContent(filename) {
+            fetch(filename)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('content').innerHTML = data;
+                })
+                .catch(error => {
+                    document.getElementById('content').innerHTML = "<p>載入錯誤，請稍後再試。</p>";
+                });
+        }
+    </script>
+</body>
+</html>
