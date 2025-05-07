@@ -24,12 +24,15 @@
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         #content {
             width: 85%;
-            padding: 20px;
-            overflow-y: auto;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
         }
 
         #menu h3 {
@@ -44,11 +47,20 @@
             text-decoration: none;
             margin: 5px 0;
             border-radius: 4px;
-            cursor: pointer;
         }
 
         #menu a:hover {
             background-color: #ddd;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .welcome-message {
+            padding: 20px;
         }
 
         .hamburger {
@@ -63,6 +75,10 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
             #menu {
                 position: fixed;
                 top: 0;
@@ -93,44 +109,46 @@
                 transform: translateX(0);
             }
         }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
     </style>
 </head>
 <body>
     <input type="checkbox" id="menu-toggle" aria-label="Toggle menu">
     <label for="menu-toggle" class="hamburger">☰</label>
+    
     <nav id="menu" aria-labelledby="menu-heading">
         <h3 id="menu-heading">選單</h3>
-        <a href="javascript:void(0);" onclick="loadContent('character_markmap.html')">Character Markmap 建立角色流程概念圖</a>
-        <a href="javascript:void(0);" onclick="loadContent('Character_Miller_obsidian.html')">舉例 Character Sarah Miller</a>
-        <a href="javascript:void(0);" onclick="loadContent('Character_Williams.html')">舉例 Character Dr. Emma Williams</a>
-        <a href="javascript:void(0);" onclick="loadContent('Character_JackChen.html')">舉例 Character Jack Chen</a>
+        <a href="character_markmap.html" target="content-frame">Character Markmap 建立角色流程概念圖</a>
+        <a href="Character_Miller_obsidian.html" target="content-frame">舉例 Character Sarah Miller</a>
+        <a href="Character_Williams.html" target="content-frame">舉例 Character Dr. Emma Williams</a>
+        <a href="Character_JackChen.html" target="content-frame">舉例 Character Jack Chen</a>
     </nav>
+    
     <div id="content">
-        <h2>歡迎選擇角色資料</h2>
-        <p>請從左側選單中選擇角色以查看其詳細資料。</p>
-        <div id="frame-container" style="width: 100%; height: 85vh; margin-top: 20px;"></div>
+        <div id="welcome-message" class="welcome-message">
+            <h2>歡迎選擇角色資料</h2>
+            <p>請從左側選單中選擇角色以查看其詳細資料。</p>
+        </div>
+        <iframe id="content-frame" name="content-frame" style="display:none;"></iframe>
     </div>
 
     <script>
-        function loadContent(url) {
-            const container = document.getElementById('frame-container');
-            container.innerHTML = `<iframe src="${url}" title="Content"></iframe>`;
-            
-            // Close menu on mobile after selection
-            if (window.innerWidth <= 768) {
-                document.getElementById('menu-toggle').checked = false;
+        // Hide welcome message when iframe is loaded with content
+        document.getElementById('content-frame').addEventListener('load', function() {
+            if (this.contentDocument && this.contentDocument.location.href !== 'about:blank') {
+                document.getElementById('welcome-message').style.display = 'none';
+                this.style.display = 'block';
             }
-        }
+        });
 
-        // Hamburger menu toggle for mobile
-        document.querySelector('.hamburger').addEventListener('click', function() {
-            document.getElementById('menu').classList.toggle('active');
+        // Add click event to all menu links
+        const links = document.querySelectorAll('#menu a');
+        links.forEach(link => {
+            link.addEventListener('click', function() {
+                // Close menu on mobile after selection
+                if (window.innerWidth <= 768) {
+                    document.getElementById('menu-toggle').checked = false;
+                }
+            });
         });
     </script>
 </body>
