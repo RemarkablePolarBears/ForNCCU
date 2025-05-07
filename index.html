@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -83,6 +44,7 @@
             text-decoration: none;
             margin: 5px 0;
             border-radius: 4px;
+            cursor: pointer;
         }
 
         #menu a:hover {
@@ -131,6 +93,12 @@
                 transform: translateX(0);
             }
         }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -138,14 +106,32 @@
     <label for="menu-toggle" class="hamburger">☰</label>
     <nav id="menu" aria-labelledby="menu-heading">
         <h3 id="menu-heading">選單</h3>
-        <a href="character_markmap.html" target="content">Character Markmap 建立角色流程概念圖</a>
-        <a href="Character_Miller_obsidian.html" target="content">舉例 Character Sarah Miller</a>
-        <a href="Character_Williams.html" target="content">舉例 Character Dr. Emma Williams</a>
-        <a href="Character_JackChen.html" target="content">舉例 Character Jack Chen</a>
+        <a href="javascript:void(0);" onclick="loadContent('character_markmap.html')">Character Markmap 建立角色流程概念圖</a>
+        <a href="javascript:void(0);" onclick="loadContent('Character_Miller_obsidian.html')">舉例 Character Sarah Miller</a>
+        <a href="javascript:void(0);" onclick="loadContent('Character_Williams.html')">舉例 Character Dr. Emma Williams</a>
+        <a href="javascript:void(0);" onclick="loadContent('Character_JackChen.html')">舉例 Character Jack Chen</a>
     </nav>
     <div id="content">
         <h2>歡迎選擇角色資料</h2>
         <p>請從左側選單中選擇角色以查看其詳細資料。</p>
+        <div id="frame-container" style="width: 100%; height: 85vh; margin-top: 20px;"></div>
     </div>
+
+    <script>
+        function loadContent(url) {
+            const container = document.getElementById('frame-container');
+            container.innerHTML = `<iframe src="${url}" title="Content"></iframe>`;
+            
+            // Close menu on mobile after selection
+            if (window.innerWidth <= 768) {
+                document.getElementById('menu-toggle').checked = false;
+            }
+        }
+
+        // Hamburger menu toggle for mobile
+        document.querySelector('.hamburger').addEventListener('click', function() {
+            document.getElementById('menu').classList.toggle('active');
+        });
+    </script>
 </body>
 </html>
